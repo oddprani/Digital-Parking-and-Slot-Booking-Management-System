@@ -27,7 +27,7 @@ export default function AdminPage() {
 
   const totalRevenue = allBookings
     ?.filter((b) => b.status === "completed")
-    .reduce((sum, b) => sum + b.cost, 0) ?? 0;
+    .reduce((sum, b) => sum + b.totalPrice, 0) ?? 0;
 
   const totalSlots = parkingLocations?.reduce(
     (sum, loc) => sum + loc.totalSlots,

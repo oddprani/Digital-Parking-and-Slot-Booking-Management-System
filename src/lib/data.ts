@@ -20,7 +20,7 @@ export type Booking = {
     locationId: string;
     entryTime: string;
     exitTime: string;
-    cost: number;
+    totalPrice: number;
     status: "upcoming" | "active" | "completed" | "cancelled";
 }
 
@@ -82,7 +82,7 @@ export const userBookings: Booking[] = [
         locationId: "loc1",
         entryTime: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString(),
         exitTime: new Date(now.getTime() + (2 * 24 * 60 * 60 * 1000) + (3 * 60 * 60 * 1000)).toISOString(),
-        cost: 10.50,
+        totalPrice: 10.50,
         status: "upcoming"
     },
     {
@@ -91,7 +91,7 @@ export const userBookings: Booking[] = [
         locationId: "loc2",
         entryTime: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
         exitTime: new Date(now.getTime() + 1 * 60 * 60 * 1000).toISOString(),
-        cost: 8.25,
+        totalPrice: 8.25,
         status: "active"
     },
     {
@@ -100,7 +100,7 @@ export const userBookings: Booking[] = [
         locationId: "loc3",
         entryTime: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
         exitTime: new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000) + (4 * 60 * 60 * 1000)).toISOString(),
-        cost: 6.00,
+        totalPrice: 6.00,
         status: "completed"
     },
     {
@@ -109,7 +109,7 @@ export const userBookings: Booking[] = [
         locationId: "loc4",
         entryTime: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(),
         exitTime: new Date(now.getTime() - (10 * 24 * 60 * 60 * 1000) + (2 * 60 * 60 * 1000)).toISOString(),
-        cost: 8.00,
+        totalPrice: 8.00,
         status: "completed"
     },
     {
@@ -118,7 +118,7 @@ export const userBookings: Booking[] = [
         locationId: "loc1",
         entryTime: new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000).toISOString(),
         exitTime: new Date(now.getTime() - (20 * 24 * 60 * 60 * 1000) + (1 * 60 * 60 * 1000)).toISOString(),
-        cost: 3.50,
+        totalPrice: 3.50,
         status: "cancelled"
     },
      {
@@ -127,7 +127,7 @@ export const userBookings: Booking[] = [
         locationId: "loc2",
         entryTime: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
         exitTime: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(),
-        cost: 8.25,
+        totalPrice: 8.25,
         status: "active"
     },
 ]

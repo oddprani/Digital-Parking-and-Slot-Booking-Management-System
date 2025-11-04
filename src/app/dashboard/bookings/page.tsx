@@ -63,7 +63,7 @@ function BookingsTable({ bookings, isLoading }: { bookings: Booking[] | null, is
                 {new Date(booking.exitTime).toLocaleString()}
               </TableCell>
               <TableCell className="text-right">
-                ${booking.cost.toFixed(2)}
+                ${(booking.totalPrice || 0).toFixed(2)}
               </TableCell>
               <TableCell className="text-center">
                 {booking.status === "upcoming" && (
