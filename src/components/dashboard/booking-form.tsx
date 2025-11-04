@@ -118,7 +118,7 @@ export function BookingForm({ location }: { location: ParkingLocation }) {
       title: "Booking Confirmed!",
       description: `Your spot at ${
         location.name
-      } is booked. Total cost: $${cost.toFixed(2)}`,
+      } is booked. Total cost: ₹${cost.toFixed(2)}`,
     });
     
     document.getElementById('close-dialog')?.click();
@@ -302,11 +302,11 @@ export function BookingForm({ location }: { location: ParkingLocation }) {
         <div className="space-y-2 rounded-lg border bg-slate-50 p-4 dark:bg-slate-800/50">
           <div className="flex justify-between text-muted-foreground">
             <span>Estimated Cost</span>
-            <span>${location.pricePerHour.toFixed(2)} / hour</span>
+            <span>₹{location.pricePerHour.toFixed(2)} / hour</span>
           </div>
           <div className="flex justify-between font-semibold text-xl">
             <span>Total</span>
-            <span>${cost.toFixed(2)}</span>
+            <span>₹{cost.toFixed(2)}</span>
           </div>
         </div>
 

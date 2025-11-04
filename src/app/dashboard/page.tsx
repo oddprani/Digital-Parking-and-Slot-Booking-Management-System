@@ -16,32 +16,32 @@ import { useToast } from '@/hooks/use-toast';
 
 const seedData: Omit<ParkingLocation, 'id'>[] = [
     {
-        name: "Downtown Central Garage",
-        address: "123 Main St, Anytown, USA",
-        totalSlots: 250,
-        occupiedSlots: 175,
-        pricePerHour: 3.50,
+        name: "KSRTC Bus Stand Parking",
+        address: "B. Rachaiah Double Road, Chamarajanagara, Karnataka",
+        totalSlots: 150,
+        occupiedSlots: 90,
+        pricePerHour: 20,
     },
     {
-        name: "Uptown Plaza Lot",
-        address: "456 Oak Ave, Anytown, USA",
-        totalSlots: 120,
-        occupiedSlots: 30,
-        pricePerHour: 2.75,
-    },
-    {
-        name: "Airport Economy Park",
-        address: "789 Airport Rd, Anytown, USA",
-        totalSlots: 500,
-        occupiedSlots: 450,
-        pricePerHour: 1.50,
-    },
-    {
-        name: "Riverfront Parking Deck",
-        address: "101 River Dr, Anytown, USA",
+        name: "JSS College Parking Lot",
+        address: "Srinivasa Nagar, Chamarajanagara, Karnataka",
         totalSlots: 80,
-        occupiedSlots: 75,
-        pricePerHour: 4.00,
+        occupiedSlots: 20,
+        pricePerHour: 15,
+    },
+    {
+        name: "District Hospital Parking",
+        address: "Near Court Road, Chamarajanagara, Karnataka",
+        totalSlots: 60,
+        occupiedSlots: 50,
+        pricePerHour: 25,
+    },
+    {
+        name: "Big Bazaar Shopping Lot",
+        address: "Divanara Street, Chamarajanagara, Karnataka",
+        totalSlots: 100,
+        occupiedSlots: 85,
+        pricePerHour: 30,
     }
 ];
 
