@@ -1,0 +1,247 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the ParkSmart system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "Date and time the user registered.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "registrationDate"
+      ]
+    },
+    "ParkingLocation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ParkingLocation",
+      "type": "object",
+      "description": "Represents a parking location.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Parking Location entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the parking location."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate of the parking location."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate of the parking location."
+        },
+        "totalSlots": {
+          "type": "number",
+          "description": "Total number of parking slots available at this location."
+        },
+        "hourlyRate": {
+          "type": "number",
+          "description": "Hourly rate for parking at this location."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "latitude",
+        "longitude",
+        "totalSlots",
+        "hourlyRate"
+      ]
+    },
+    "ParkingSlot": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ParkingSlot",
+      "type": "object",
+      "description": "Represents a single parking slot within a parking location.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Parking Slot entity."
+        },
+        "parkingLocationId": {
+          "type": "string",
+          "description": "Reference to ParkingLocation. (Relationship: ParkingLocation 1:N ParkingSlot)"
+        },
+        "slotNumber": {
+          "type": "string",
+          "description": "Identifier or number of the slot."
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Indicates if the slot is currently available."
+        }
+      },
+      "required": [
+        "id",
+        "parkingLocationId",
+        "slotNumber",
+        "isAvailable"
+      ]
+    },
+    "Booking": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Booking",
+      "type": "object",
+      "description": "Represents a parking booking made by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Booking entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Booking)"
+        },
+        "parkingSlotId": {
+          "type": "string",
+          "description": "Reference to ParkingSlot. (Relationship: ParkingSlot 1:N Booking)"
+        },
+        "entryDateTime": {
+          "type": "string",
+          "description": "Date and time the booking starts.",
+          "format": "date-time"
+        },
+        "exitDateTime": {
+          "type": "string",
+          "description": "Date and time the booking ends.",
+          "format": "date-time"
+        },
+        "bookingDateTime": {
+          "type": "string",
+          "description": "Date and time the booking was made.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the booking (e.g., active, completed, cancelled)."
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "Total price of the booking."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "parkingSlotId",
+        "entryDateTime",
+        "exitDateTime",
+        "bookingDateTime",
+        "status",
+        "totalPrice"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Secured by Firebase Authentication; only the user can read/write their own document.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, obtained from Firebase Authentication (request.auth.uid)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/parking_locations/{parkingLocationId}",
+        "definition": {
+          "entityName": "ParkingLocation",
+          "schema": {
+            "$ref": "#/backend/entities/ParkingLocation"
+          },
+          "description": "Stores information about parking locations, including name, coordinates, total slots, and hourly rate. Write access restricted to authorized admins.",
+          "params": [
+            {
+              "name": "parkingLocationId",
+              "description": "The unique identifier for the parking location."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/parking_locations/{parkingLocationId}/parking_slots/{parkingSlotId}",
+        "definition": {
+          "entityName": "ParkingSlot",
+          "schema": {
+            "$ref": "#/backend/entities/ParkingSlot"
+          },
+          "description": "Stores information about individual parking slots within a parking location. The `parkingLocationId` parameter ensures that each parking slot is associated with a specific parking location. Write access restricted to authorized admins.",
+          "params": [
+            {
+              "name": "parkingLocationId",
+              "description": "The unique identifier of the parking location to which this slot belongs."
+            },
+            {
+              "name": "parkingSlotId",
+              "description": "The unique identifier for the parking slot."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/bookings/{bookingId}",
+        "definition": {
+          "entityName": "Booking",
+          "schema": {
+            "$ref": "#/backend/entities/Booking"
+          },
+          "description": "Stores booking information for each user. Secured by path-based ownership: only the user can read/write their own bookings. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who made the booking."
+            },
+            {
+              "name": "bookingId",
+              "description": "The unique identifier for the booking."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support a secure and scalable parking slot booking system (ParkSmart). The structure prioritizes authorization independence through denormalization and structural segregation to simplify security rules and enhance debuggability.\n\n**Authorization Independence (Denormalization):**\nTo avoid using `get()` calls in security rules, the structure denormalizes relevant authorization data. For example, the `Booking` collection, which is a subcollection of `/users/{userId}`, inherits its authorization context from the parent `user`.  This ensures that the security rules for bookings can be evaluated independently without needing to fetch parent user data.\n\n**Structural Segregation (Homogeneous Security Posture):**\nThe data is segregated into collections based on access requirements. User-specific data (bookings) are placed under `/users/{userId}` which is secured by path-based ownership. Public data like parking locations are stored in the root collection `/parking_locations`.\n\n**Access Modeling:**\n*   **User Data:** Uses path-based ownership for user-specific data like bookings (`/users/{userId}/bookings/{bookingId}`).\n*   **Public Data:** Parking locations are accessible globally through the `/parking_locations` collection.\n\n**QAPs (Rules are not Filters):**\nThe structure supports secure listing operations by enforcing consistent security rules across documents within each collection.  For example, listing bookings under a specific user is secure because of the path-based ownership enforced by the rules.  Listing parking locations is also secure because it's a public collection, and security rules can restrict write access to authorized users only.\n\n**Invariants:**\nThe data structure supports the integrity of ownership and timestamps by storing bookings under the respective user ID, ensuring ownership is easily verifiable via path. Timestamps like `bookingDateTime` are enforced by security rules during creation."
+  }
+}

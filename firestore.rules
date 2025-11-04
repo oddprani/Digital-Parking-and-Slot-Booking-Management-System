@@ -1,0 +1,98 @@
+/**
+ * @fileoverview Firestore Security Rules for ParkSmart.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user-specific data (e.g., bookings)
+ * and restricts write access to parking locations and slots to authorized admins.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information.
+ * - /parking_locations/{parkingLocationId}: Stores information about parking locations.
+ * - /parking_locations/{parkingLocationId}/parking_slots/{parkingSlotId}: Stores information about individual parking slots.
+ * - /users/{userId}/bookings/{bookingId}: Stores booking information for each user.
+ *
+ * Key Security Decisions:
+ * - Users can only access their own user documents and bookings.
+ * - Parking locations and parking slots are write-protected (admin-only).
+ * - Listing all users is disallowed.
+ *
+ * Denormalization for Authorization:
+ * - Bookings are stored as a subcollection of users (/users/{userId}/bookings/{bookingId})
+ *   to simplify authorization checks. The userId is also stored in the booking data.
+ *   This ensures that we do not have to perform additional reads to verify ownership.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Enforces access control for user profile information.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' can create their own profile.
+     * @allow (get) User with ID 'user123' can read their own profile.
+     * @allow (update) User with ID 'user123' can update their own profile.
+     * @allow (delete) User with ID 'user123' can delete their own profile.
+     * @deny (create) User with ID 'user123' cannot create a profile for 'user456'.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+
+      allow get: if isOwner(userId);
+      allow list: if false; // Listing all users is not permitted.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && resource.data.id == userId;
+      allow delete: if isOwner(userId) && resource.data.id == userId;
+    }
+
+    /**
+     * @description Controls access to parking location data.
+     * @path /parking_locations/{parkingLocationId}
+     * @allow (get) Any user can read parking location data.
+     * @deny (create) Non-admin users cannot create parking location data.
+     * @principle Restricts write access to authorized admins.
+     */
+    match /parking_locations/{parkingLocationId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role check.
+    }
+
+    /**
+     * @description Controls access to parking slot data within a specific parking location.
+     * @path /parking_locations/{parkingLocationId}/parking_slots/{parkingSlotId}
+     * @allow (get) Any user can read parking slot data.
+     * @deny (create) Non-admin users cannot create parking slot data.
+     * @principle Restricts write access to authorized admins.
+     */
+    match /parking_locations/{parkingLocationId}/parking_slots/{parkingSlotId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add admin role check.
+    }
+
+    /**
+     * @description Enforces access control for booking data, allowing only the owner to read/write.
+     * @path /users/{userId}/bookings/{bookingId}
+     * @allow (create) User with ID 'user123' can create a booking for themselves.
+     * @allow (get) User with ID 'user123' can read their own booking.
+     * @allow (update) User with ID 'user123' can update their own booking.
+     * @allow (delete) User with ID 'user123' can delete their own booking.
+     * @deny (create) User with ID 'user123' cannot create a booking for 'user456'.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId}/bookings/{bookingId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isOwner(userId) && resource.data.userId == userId;
+      allow delete: if isOwner(userId) && resource.data.userId == userId;
+    }
+  }
+}
