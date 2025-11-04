@@ -1,5 +1,5 @@
-# Firebase Studio
+# ParkSmart
 
-This is a NextJS starter in Firebase Studio.
+This is a Next.js starter for ParkSmart, a Digital Parking and Slot Booking Management System.
 
-To get started, take a look at src/app/page.tsx.
+To get started, take a look at `src/app/page.tsx`.

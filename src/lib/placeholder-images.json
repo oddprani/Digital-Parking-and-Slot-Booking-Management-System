@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "auth-bg",
+      "description": "A modern, clean parking garage.",
+      "imageUrl": "https://images.unsplash.com/photo-1569872011373-0070303cd859?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwYXJraW5nJTIwZ2FyYWdlfGVufDB8fHx8MTc2MjIxMzc2Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "parking garage"
+    },
+    {
+      "id": "loc-1",
+      "description": "Downtown Central Garage",
+      "imageUrl": "https://images.unsplash.com/photo-1718732129311-de7573cf7ee8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y2l0eSUyMGdhcmFnZXxlbnwwfHx8fDE3NjIyNjk0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city garage"
+    },
+    {
+      "id": "loc-2",
+      "description": "Uptown Plaza Lot",
+      "imageUrl": "https://images.unsplash.com/photo-1604063155785-ee4488b8ad15?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwYXJraW5nJTIwbG90fGVufDB8fHx8MTc2MjI2NjcwNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "parking lot"
+    },
+    {
+      "id": "loc-3",
+      "description": "Airport Economy Park",
+      "imageUrl": "https://images.unsplash.com/photo-1630183921674-47cc47ad831e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhaXJwb3J0JTIwcGFya2luZ3xlbnwwfHx8fDE3NjIyNjk0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "airport parking"
+    },
+    {
+      "id": "loc-4",
+      "description": "Riverfront Parking Deck",
+      "imageUrl": "https://images.unsplash.com/photo-1602548375899-5a16d44ed412?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwYXJraW5nJTIwZGVja3xlbnwwfHx8fDE3NjIyNjk0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "parking deck"
+    }
+  ]
 }

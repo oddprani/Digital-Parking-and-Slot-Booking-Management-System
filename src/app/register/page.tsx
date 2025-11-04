@@ -23,11 +23,12 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { users } from "@/lib/data";
 
 const formSchema = z.object({
+  name: z.string().min(1, { message: "Name is required." }),
   email: z.string().email({ message: "Please enter a valid email." }),
-  password: z.string().min(1, { message: "Password is required." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const { toast } = useToast();
   const authBgImage = PlaceHolderImages.find((img) => img.id === "auth-bg");
@@ -35,33 +36,28 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const user = users.find(
-      (u) => u.email === values.email && u.password === values.password
-    );
+    // In a real app, you'd save the new user to the database.
+    users.push({
+        id: users.length + 1,
+        name: values.name,
+        email: values.email,
+        password: values.password, // Don't store plain text passwords!
+        role: "user",
+    });
 
-    if (user) {
-      toast({
-        title: "Login Successful",
-        description: "Welcome back!",
-      });
-      if (user.role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard");
-      }
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: "Invalid email or password.",
-      });
-    }
+    toast({
+      title: "Registration Successful",
+      description: "You can now log in with your credentials.",
+    });
+
+    router.push("/");
   }
 
   return (
@@ -69,16 +65,29 @@ export default function LoginPage() {
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <div className="flex items-center justify-center gap-2">
+             <div className="flex items-center justify-center gap-2">
               <ParkSmartIcon className="h-8 w-8 text-primary" />
               <h1 className="text-3xl font-bold">ParkSmart</h1>
             </div>
             <p className="text-balance text-muted-foreground">
-              Enter your email below to login to your account
+              Create an account to start managing your parking.
             </p>
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="email"
@@ -109,14 +118,14 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" className="w-full">
-                Login
+                Create account
               </Button>
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="underline">
-              Sign up
+            Already have an account?{" "}
+            <Link href="/" className="underline">
+              Log in
             </Link>
           </div>
         </div>
