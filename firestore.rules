@@ -59,7 +59,7 @@ service cloud.firestore {
      */
     match /parking_locations/{parkingLocationId} {
       allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Add admin role check.
+      allow create, update, delete: if request.auth != null; // TODO: Add admin role check.
     }
 
     /**
