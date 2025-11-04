@@ -1,129 +1,83 @@
-# 🚗 Digital Parking and Slot Booking Management System
+# 🚗 ParkSmart - Digital Parking Management System
 
-A **web-based smart parking management application** built using **TypeScript**, **CSS**, and a robust backend framework. This system allows users to find, book, and manage parking slots online with real-time availability tracking and secure authentication.
+A **web-based smart parking management application** built with **Next.js**, **React**, **TypeScript**, **Tailwind CSS**, and **Firebase**. This system allows users to find and book parking slots online with real-time availability tracking and secure authentication.
 
 ---
 
 ## 🧩 Features
 
-* 🔐 **User Authentication** – Register, login, and manage profiles securely
-* 🕒 **Real-Time Slot Availability** – View available parking slots based on time and location
-* 💳 **Online Booking & Cancellation** – Reserve and cancel slots dynamically
-* 💡 **Smart Pricing** – Dynamic pricing based on vehicle type and duration
-* 📊 **Admin Dashboard** – Manage lots, track usage, and generate reports
-* 📱 **Responsive UI** – Built with TypeScript and CSS for clean, scalable design
+*   🔐 **Firebase Authentication** – Secure user registration and login.
+*   🕒 **Real-Time Slot Availability** – View available parking slots from a Firestore database.
+*   💳 **Online Booking** – Reserve parking spots with start and end times.
+*   📊 **Admin Dashboard** – Manage parking locations and view overall occupancy.
+*   📱 **Responsive UI** – Built with ShadCN UI components and Tailwind CSS for a modern, scalable design.
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ Tech Stack
 
-The system follows a **client–server model**:
-
-* **Frontend:** TypeScript + CSS
-* **Backend:** Node.js / Express (TypeScript)
-* **Database:** MongoDB or PostgreSQL
-* **Authentication:** JWT (JSON Web Tokens)
-* **Optional:** Razorpay / Stripe API for payments
+| Category         | Technology                                                              |
+| ---------------- | ----------------------------------------------------------------------- |
+| **Framework**    | [Next.js](https://nextjs.org/) (with App Router)                        |
+| **UI**           | [React](https://react.dev/), [ShadCN UI](https://ui.shadcn.com/), [Tailwind CSS](https://tailwindcss.com/) |
+| **Language**     | [TypeScript](https://www.typescriptlang.org/)                         |
+| **Backend**      | [Firebase](https://firebase.google.com/) (Authentication & Firestore) |
+| **GenAI**        | [Genkit](https://firebase.google.com/docs/genkit)                     |
 
 ---
 
-## ⚙️ Installation
+## ⚙️ Running the Project Locally
 
-### 1. Clone the Repository
+To run this project on your local machine, follow these steps.
+
+### 1. Install Dependencies
+
+First, you need to install the necessary Node.js packages. Open your terminal in the project's root directory and run:
 
 ```bash
-git clone https://github.com/your-username/digital-parking-system.git
-cd digital-parking-system
+npm install
 ```
 
-### 2. Setup the Backend
+### 2. Run the Development Server
+
+Once the dependencies are installed, you can start the Next.js development server. The project is configured to run on port `9002`.
 
 ```bash
-cd server
-npm install
-cp .env.example .env
-# Edit .env with Mongo URI and JWT_SECRET
 npm run dev
 ```
 
-### 3. Setup the Frontend
+The application will now be running at [http://localhost:9002](http://localhost:9002).
 
-```bash
-cd client
-npm install
-npm start
-```
+### Firebase Setup
 
-Then open [http://localhost:5173](http://localhost:5173) in your browser.
-
----
-
-## 🧠 Technologies Used
-
-| Category            | Technology                    |
-| ------------------- | ----------------------------- |
-| **Frontend**        | TypeScript, CSS, HTML         |
-| **Backend**         | Node.js, Express (TypeScript) |
-| **Database**        | MongoDB / PostgreSQL          |
-| **Authentication**  | JWT                           |
-| **Version Control** | Git & GitHub                  |
-| **Optional APIs**   | Razorpay / Google Maps API    |
-
----
-
-## 🧭 Project Workflow
-
-1. User registers and logs in.
-2. System displays available locations and slots.
-3. User enters entry and exit times to check availability.
-4. Pricing is calculated dynamically based on duration.
-5. Booking is confirmed and visible on the user dashboard.
-6. Users can cancel bookings; freed slots return to availability.
-7. Admin can view analytics and generate usage reports.
+This project is configured to connect to a Firebase project automatically. When you run the application for the first time, it will seed the Firestore database with initial data for parking locations.
 
 ---
 
 ## 🧰 Folder Structure
 
+The project uses the Next.js App Router structure.
+
 ```
-digital-parking-system/
+parksmart-app/
 │
-├── client/                # Frontend (TypeScript + CSS)
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── App.tsx
-│   │   └── index.html
-│   └── package.json
+├── src/
+│   ├── app/                 # Main application routes and pages
+│   │   ├── admin/           # Admin dashboard pages
+│   │   ├── dashboard/       # User dashboard pages
+│   │   ├── layout.tsx
+│   │   └── page.tsx         # Login page
+│   │
+│   ├── components/          # Reusable React components
+│   │   ├── ui/              # ShadCN UI components
+│   │   └── ...
+│   │
+│   ├── firebase/            # Firebase configuration and hooks
+│   │
+│   ├── lib/                 # Utility functions, data types, etc.
+│   └── ...
 │
-├── server/                # Backend (Node.js + Express)
-│   ├── src/
-│   │   ├── routes/
-│   │   ├── models/
-│   │   ├── middleware/
-│   │   └── index.ts
-│   ├── .env.example
-│   └── package.json
-│
-└── README.md
+├── public/                  # Static assets
+├── package.json             # Project dependencies and scripts
+└── next.config.ts           # Next.js configuration
 ```
-
----
-
-## 📈 Future Enhancements
-
-* 🌐 Integration with Google Maps for live parking navigation
-* 🔔 Push notifications for booking reminders
-* ⚡ AI-based predictive slot availability
-* 🔌 EV charging slot support
-* 📱 Mobile app version (React Native or Flutter)
-
----
-
-## 🧑‍💻 Contributors
-
-* **Vivek** – Developer & Designer
-* **Project Type:** Academic / Smart City Initiative
-
----
-
