@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AreaChart, Building, BookCopy, LayoutGrid } from "lucide-react";
+import { AreaChart, Building, BookCopy, LayoutGrid, MapPin } from "lucide-react";
 
 import {
   Tooltip,
@@ -31,13 +31,25 @@ export default function AdminLayout({
               <TooltipTrigger asChild>
                 <Link
                   href="/admin"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <AreaChart className="h-5 w-5" />
                   <span className="sr-only">Overview</span>
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Overview</TooltipContent>
+            </Tooltip>
+             <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/admin/locations"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                >
+                  <Building className="h-5 w-5" />
+                  <span className="sr-only">Locations</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Locations</TooltipContent>
             </Tooltip>
              <Tooltip>
               <TooltipTrigger asChild>

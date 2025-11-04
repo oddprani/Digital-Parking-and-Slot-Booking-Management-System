@@ -5,6 +5,7 @@ import {
   CalendarDays,
   MapPin,
   AreaChart,
+  Building,
 } from "lucide-react";
 import {
   Sheet,
@@ -24,6 +25,7 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
   ];
   const adminLinks = [
     { href: "/admin", icon: AreaChart, label: "Overview" },
+    { href: "/admin/locations", icon: Building, label: "Locations" },
   ];
   const links = isAdmin ? adminLinks : userLinks;
 
