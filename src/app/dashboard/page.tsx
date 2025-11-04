@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -7,12 +8,48 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LocationCard } from "@/components/dashboard/location-card";
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking } from "@/firebase";
 import { collection, query } from "firebase/firestore";
 import type { ParkingLocation } from "@/lib/data";
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+
+const seedData: Omit<ParkingLocation, 'id'>[] = [
+    {
+        name: "Downtown Central Garage",
+        address: "123 Main St, Anytown, USA",
+        totalSlots: 250,
+        occupiedSlots: 175,
+        pricePerHour: 3.50,
+    },
+    {
+        name: "Uptown Plaza Lot",
+        address: "456 Oak Ave, Anytown, USA",
+        totalSlots: 120,
+        occupiedSlots: 30,
+        pricePerHour: 2.75,
+    },
+    {
+        name: "Airport Economy Park",
+        address: "789 Airport Rd, Anytown, USA",
+        totalSlots: 500,
+        occupiedSlots: 450,
+        pricePerHour: 1.50,
+    },
+    {
+        name: "Riverfront Parking Deck",
+        address: "101 River Dr, Anytown, USA",
+        totalSlots: 80,
+        occupiedSlots: 75,
+        pricePerHour: 4.00,
+    }
+];
 
 export default function Dashboard() {
   const firestore = useFirestore();
+  const { toast } = useToast();
+  const [isSeeding, setIsSeeding] = React.useState(false);
+
   const locationsQuery = useMemoFirebase(
     () => (firestore ? query(collection(firestore, "parking_locations")) : null),
     [firestore]
@@ -22,6 +59,29 @@ export default function Dashboard() {
     isLoading,
     error,
   } = useCollection<ParkingLocation>(locationsQuery);
+
+  const handleSeedData = async () => {
+    if (!firestore) return;
+    setIsSeeding(true);
+    try {
+      const locationsColRef = collection(firestore, 'parking_locations');
+      for (const locationData of seedData) {
+        addDocumentNonBlocking(locationsColRef, locationData);
+      }
+      toast({
+        title: 'Seeding Complete',
+        description: `${seedData.length} parking locations have been added.`,
+      });
+    } catch (e: any) {
+       toast({
+        variant: 'destructive',
+        title: 'Seeding Failed',
+        description: e.message || 'Could not seed data.',
+      });
+    } finally {
+        setIsSeeding(false);
+    }
+  };
 
   return (
     <div>
@@ -35,11 +95,25 @@ export default function Dashboard() {
         <CardContent>
           {isLoading && <p>Loading locations...</p>}
           {error && <p className="text-destructive">Error loading locations: {error.message}</p>}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {parkingLocations?.map((location) => (
-              <LocationCard key={location.id} location={location} />
-            ))}
-          </div>
+          
+          {!isLoading && !error && parkingLocations && parkingLocations.length > 0 && (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {parkingLocations.map((location) => (
+                <LocationCard key={location.id} location={location} />
+              ))}
+            </div>
+          )}
+
+          {!isLoading && parkingLocations?.length === 0 && (
+            <div className="flex items-center justify-center rounded-lg border border-dashed shadow-sm h-[200px] mt-4">
+                <div className='text-center'>
+                    <p className="text-muted-foreground mb-2">No parking locations found.</p>
+                    <Button onClick={handleSeedData} variant="default" disabled={isSeeding}>
+                        {isSeeding ? "Seeding..." : "Seed Dummy Data"}
+                    </Button>
+                </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
