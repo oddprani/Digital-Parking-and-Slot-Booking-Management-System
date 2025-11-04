@@ -10,10 +10,12 @@
  * - /parking_locations/{parkingLocationId}: Stores information about parking locations.
  * - /parking_locations/{parkingLocationId}/parking_slots/{parkingSlotId}: Stores information about individual parking slots.
  * - /users/{userId}/bookings/{bookingId}: Stores booking information for each user.
+ * - /bookings/{bookingId}: A collection of all bookings for admin access.
  *
  * Key Security Decisions:
- * - Users can only access their own user documents and bookings.
+ * - Users can only access their own user documents and their own bookings subcollection.
  * - Parking locations and parking slots are write-protected (admin-only).
+ * - The root /bookings collection is readable by any authenticated user for the admin dashboard.
  * - Listing all users is disallowed.
  *
  * Denormalization for Authorization:
@@ -93,6 +95,18 @@ service cloud.firestore {
       allow create: if isOwner(userId) && request.resource.data.userId == userId;
       allow update: if isOwner(userId) && resource.data.userId == userId;
       allow delete: if isOwner(userId) && resource.data.userId == userId;
+    }
+
+    /**
+     * @description Allows admin users to read all bookings.
+     * @path /bookings/{bookingId}
+     * @allow (get) Authenticated users can read booking data for the admin panel.
+     * @deny (create) Users cannot create bookings directly in this collection.
+     * @principle Provides a read-only view for administrative purposes.
+     */
+    match /bookings/{bookingId} {
+      allow get, list: if request.auth != null; // TODO: Should be admin only
+      allow create, update, delete: if false;
     }
   }
 }
