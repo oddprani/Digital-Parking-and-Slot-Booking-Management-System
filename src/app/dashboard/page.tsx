@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -60,8 +60,8 @@ export default function Dashboard() {
     error,
   } = useCollection<ParkingLocation>(locationsQuery);
 
-  const handleSeedData = async () => {
-    if (!firestore) return;
+  const handleSeedData = React.useCallback(async () => {
+    if (!firestore || isSeeding) return;
     setIsSeeding(true);
     try {
       const locationsColRef = collection(firestore, 'parking_locations');
@@ -70,7 +70,7 @@ export default function Dashboard() {
       }
       toast({
         title: 'Seeding Complete',
-        description: `${seedData.length} parking locations have been added.`,
+        description: `Your dashboard is ready with initial parking locations.`,
       });
     } catch (e: any) {
        toast({
@@ -81,7 +81,14 @@ export default function Dashboard() {
     } finally {
         setIsSeeding(false);
     }
-  };
+  }, [firestore, toast, isSeeding]);
+
+  useEffect(() => {
+    if (!isLoading && parkingLocations?.length === 0 && firestore) {
+      handleSeedData();
+    }
+  }, [isLoading, parkingLocations, firestore, handleSeedData]);
+
 
   return (
     <div>
@@ -93,7 +100,7 @@ export default function Dashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading && <p>Loading locations...</p>}
+          {isLoading && !parkingLocations && <p>Loading locations...</p>}
           {error && <p className="text-destructive">Error loading locations: {error.message}</p>}
           
           {!isLoading && !error && parkingLocations && parkingLocations.length > 0 && (
@@ -108,9 +115,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-center rounded-lg border border-dashed shadow-sm h-[200px] mt-4">
                 <div className='text-center'>
                     <p className="text-muted-foreground mb-2">No parking locations found.</p>
-                    <Button onClick={handleSeedData} variant="default" disabled={isSeeding}>
-                        {isSeeding ? "Seeding..." : "Seed Dummy Data"}
-                    </Button>
+                    <p className="text-sm text-muted-foreground">Automatically seeding initial data...</p>
                 </div>
             </div>
           )}

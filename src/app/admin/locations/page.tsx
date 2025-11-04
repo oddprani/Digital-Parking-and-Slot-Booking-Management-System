@@ -42,7 +42,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const locationSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -205,13 +205,12 @@ export default function AdminLocationsPage() {
     error,
   } = useCollection<ParkingLocation>(locationsQuery);
 
-  const handleSeedData = async () => {
-    if (!firestore) return;
+  const handleSeedData = React.useCallback(async () => {
+    if (!firestore || isSeeding) return;
     setIsSeeding(true);
     try {
       const locationsColRef = collection(firestore, 'parking_locations');
       for (const locationData of seedData) {
-        // Use a consistent ID generation scheme if needed, or let Firestore auto-generate
         addDocumentNonBlocking(locationsColRef, locationData);
       }
       toast({
@@ -227,7 +226,13 @@ export default function AdminLocationsPage() {
     } finally {
         setIsSeeding(false);
     }
-  };
+  }, [firestore, toast, isSeeding]);
+
+  useEffect(() => {
+    if (!isLoading && parkingLocations?.length === 0 && firestore) {
+      handleSeedData();
+    }
+  }, [isLoading, parkingLocations, firestore, handleSeedData]);
 
   return (
     <Card>
@@ -239,9 +244,6 @@ export default function AdminLocationsPage() {
           </CardDescription>
         </div>
         <div className="flex gap-2">
-            <Button onClick={handleSeedData} variant="outline" disabled={isSeeding || (parkingLocations && parkingLocations.length > 0)}>
-                {isSeeding ? "Seeding..." : "Seed Dummy Data"}
-            </Button>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                 <Button>Add Location</Button>
@@ -256,7 +258,7 @@ export default function AdminLocationsPage() {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading && <p>Loading locations...</p>}
+        {isLoading && !parkingLocations && <p>Loading locations...</p>}
         {error && (
           <p className="text-destructive">
             Error loading locations: {error.message}
@@ -294,9 +296,7 @@ export default function AdminLocationsPage() {
             <div className="flex items-center justify-center rounded-lg border border-dashed shadow-sm h-[200px] mt-4">
                 <div className='text-center'>
                     <p className="text-muted-foreground mb-2">No parking locations found.</p>
-                    <Button onClick={handleSeedData} variant="default" disabled={isSeeding}>
-                        {isSeeding ? "Seeding..." : "Seed Dummy Data"}
-                    </Button>
+                    <p className="text-sm text-muted-foreground">Automatically seeding initial data...</p>
                 </div>
             </div>
         )}
