@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +21,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ParkSmartIcon } from "@/components/icons";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { users } from "@/lib/data";
+import { useAuth, useUser } from "@/firebase";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
@@ -31,6 +33,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const authBgImage = PlaceHolderImages.find((img) => img.id === "auth-bg");
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,28 +44,36 @@ export default function LoginPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const user = users.find(
-      (u) => u.email === values.email && u.password === values.password
-    );
+  useEffect(() => {
+    if (user && !isUserLoading) {
+      // TODO: Check for admin role
+      router.push("/dashboard");
+    }
+  }, [user, isUserLoading, router]);
 
-    if (user) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Login Successful",
         description: "Welcome back!",
       });
-      if (user.role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard");
-      }
-    } else {
+      router.push("/dashboard");
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid email or password.",
+        description: error.message || "Invalid email or password.",
       });
     }
+  }
+
+  if (isUserLoading || user) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
@@ -108,8 +120,8 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "Logging in..." : "Login"}
               </Button>
             </form>
           </Form>

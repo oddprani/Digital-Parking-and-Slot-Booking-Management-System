@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -14,9 +15,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
-import { parkingLocations } from "@/lib/data";
+import type { ParkingLocation } from "@/lib/data";
 
-export function RealTimeView() {
+export function RealTimeView({ locations }: { locations: ParkingLocation[] | null}) {
   return (
     <Card>
       <CardHeader>
@@ -37,7 +38,7 @@ export function RealTimeView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {parkingLocations.map((location) => {
+            {locations?.map((location) => {
               const available = location.totalSlots - location.occupiedSlots;
               const occupancy = (location.occupiedSlots / location.totalSlots) * 100;
               return (

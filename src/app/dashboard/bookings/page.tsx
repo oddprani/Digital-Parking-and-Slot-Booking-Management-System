@@ -1,4 +1,5 @@
-import { Badge } from "@/components/ui/badge";
+"use client";
+
 import {
   Card,
   CardContent,
@@ -15,26 +16,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { userBookings, parkingLocations } from "@/lib/data";
-import { Booking, ParkingLocation } from "@/lib/data";
+import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import type { Booking } from "@/lib/data";
 import { Button } from "@/components/ui/button";
+import { collection, query, where } from "firebase/firestore";
 
-// In a real app, you'd fetch this for the logged-in user
-const currentUserBookings = userBookings.filter(
-  (booking) => booking.userId === 1
-);
-
-const getLocationName = (locationId: number) => {
-  return (
-    parkingLocations.find((loc) => loc.id === locationId)?.name ?? "Unknown"
-  );
-};
-
-const bookingsByStatus = (status: Booking["status"]) =>
-  currentUserBookings.filter((b) => b.status === status);
-
-function BookingsTable({ bookings }: { bookings: Booking[] }) {
-  if (bookings.length === 0) {
+function BookingsTable({ bookings, isLoading }: { bookings: Booking[] | null, isLoading: boolean }) {
+  if (isLoading) {
+    return (
+       <div className="flex items-center justify-center rounded-lg border border-dashed shadow-sm h-[200px]">
+        <p className="text-muted-foreground">Loading bookings...</p>
+      </div>
+    )
+  }
+  
+  if (!bookings || bookings.length === 0) {
     return (
       <div className="flex items-center justify-center rounded-lg border border-dashed shadow-sm h-[200px]">
         <p className="text-muted-foreground">No bookings found.</p>
@@ -47,7 +43,7 @@ function BookingsTable({ bookings }: { bookings: Booking[] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Location</TableHead>
+            <TableHead>Location ID</TableHead>
             <TableHead>Entry</TableHead>
             <TableHead>Exit</TableHead>
             <TableHead className="text-right">Cost</TableHead>
@@ -58,7 +54,7 @@ function BookingsTable({ bookings }: { bookings: Booking[] }) {
           {bookings.map((booking) => (
             <TableRow key={booking.id}>
               <TableCell className="font-medium">
-                {getLocationName(booking.locationId)}
+                {booking.locationId}
               </TableCell>
               <TableCell>
                 {new Date(booking.entryTime).toLocaleString()}
@@ -85,6 +81,19 @@ function BookingsTable({ bookings }: { bookings: Booking[] }) {
 }
 
 export default function BookingsPage() {
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
+
+  const bookingsQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, `users/${user.uid}/bookings`));
+  }, [firestore, user]);
+
+  const { data: userBookings, isLoading: areBookingsLoading } = useCollection<Booking>(bookingsQuery);
+
+  const bookingsByStatus = (status: Booking["status"]) =>
+    userBookings?.filter((b) => b.status === status) || [];
+
   const upcomingBookings = bookingsByStatus("upcoming");
   const activeBookings = bookingsByStatus("active");
   const completedBookings = bookingsByStatus("completed");
@@ -109,7 +118,7 @@ export default function BookingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <BookingsTable bookings={upcomingBookings} />
+            <BookingsTable bookings={upcomingBookings} isLoading={isUserLoading || areBookingsLoading} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -122,7 +131,7 @@ export default function BookingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <BookingsTable bookings={activeBookings} />
+            <BookingsTable bookings={activeBookings} isLoading={isUserLoading || areBookingsLoading} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -133,7 +142,7 @@ export default function BookingsPage() {
             <CardDescription>Your past parking history.</CardDescription>
           </CardHeader>
           <CardContent>
-            <BookingsTable bookings={completedBookings} />
+            <BookingsTable bookings={completedBookings} isLoading={isUserLoading || areBookingsLoading} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -146,7 +155,7 @@ export default function BookingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <BookingsTable bookings={cancelledBookings} />
+            <BookingsTable bookings={cancelledBookings} isLoading={isUserLoading || areBookingsLoading} />
           </CardContent>
         </Card>
       </TabsContent>

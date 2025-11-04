@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Avatar,
   AvatarFallback,
@@ -14,23 +16,46 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { users } from "@/lib/data";
-
-// In a real app, you'd get the logged-in user's data
-const user = users.find(u => u.id === 1);
-const adminUser = users.find(u => u.id === 2);
-
+import { useAuth, useUser } from "@/firebase";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 export function UserNav({ isAdmin = false }: { isAdmin?: boolean }) {
-  const currentUser = isAdmin ? adminUser : user;
-  const initials = currentUser?.name.split(' ').map(n => n[0]).join('');
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/");
+  };
+
+  if (isUserLoading) {
+    return (
+      <Button variant="ghost" className="relative h-8 w-8 rounded-full" disabled>
+        <Avatar className="h-8 w-8"></Avatar>
+      </Button>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Button asChild>
+        <Link href="/">Login</Link>
+      </Button>
+    );
+  }
+
+  const initials = user.displayName
+    ? user.displayName.split(" ").map((n) => n[0]).join("")
+    : user.email?.charAt(0).toUpperCase();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatars/01.png" alt={`@${currentUser?.name}`} />
+            <AvatarImage src={user.photoURL ?? ""} alt={`@${user.displayName}`} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </Button>
@@ -38,9 +63,9 @@ export function UserNav({ isAdmin = false }: { isAdmin?: boolean }) {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{currentUser?.name}</p>
+            <p className="text-sm font-medium leading-none">{user.displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {currentUser?.email}
+              {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -54,8 +79,8 @@ export function UserNav({ isAdmin = false }: { isAdmin?: boolean }) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/">Log out</Link>
+        <DropdownMenuItem onClick={handleLogout}>
+          Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

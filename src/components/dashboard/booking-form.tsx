@@ -11,6 +11,7 @@ import {
   Zap,
   Accessibility,
 } from "lucide-react";
+import { collection, doc, serverTimestamp } from "firebase/firestore";
 
 import { ParkingLocation } from "@/lib/data";
 import { bookingSchema } from "@/lib/schemas";
@@ -40,11 +41,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { DialogFooter } from "@/components/ui/dialog";
+import { DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { useFirestore, useUser, addDocumentNonBlocking } from "@/firebase";
 
 export function BookingForm({ location }: { location: ParkingLocation }) {
   const [cost, setCost] = useState(0);
   const { toast } = useToast();
+  const firestore = useFirestore();
+  const { user } = useUser();
 
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
@@ -84,14 +88,40 @@ export function BookingForm({ location }: { location: ParkingLocation }) {
   };
 
   function onSubmit(values: z.infer<typeof bookingSchema>) {
-    // In a real app, you would submit this to your backend
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Not authenticated",
+        description: "You must be logged in to make a booking.",
+      });
+      return;
+    }
+    
+    const entryDateTime = new Date(`${format(values.entryDate, "yyyy-MM-dd")}T${values.entryTime}`);
+    const exitDateTime = new Date(`${format(values.exitDate, "yyyy-MM-dd")}T${values.exitTime}`);
+
+    const newBooking = {
+      userId: user.uid,
+      locationId: location.id,
+      parkingSlotId: "TBD", // This would be assigned by the backend in a real scenario
+      entryDateTime: entryDateTime.toISOString(),
+      exitDateTime: exitDateTime.toISOString(),
+      bookingDateTime: new Date().toISOString(),
+      status: "upcoming",
+      totalPrice: cost,
+    };
+    
+    const bookingsColRef = collection(firestore, `users/${user.uid}/bookings`);
+    addDocumentNonBlocking(bookingsColRef, newBooking);
+
     toast({
       title: "Booking Confirmed!",
       description: `Your spot at ${
         location.name
       } is booked. Total cost: $${cost.toFixed(2)}`,
     });
-    // Here you would typically close the dialog
+    
+    document.getElementById('close-dialog')?.click();
   }
 
   return (
@@ -281,8 +311,11 @@ export function BookingForm({ location }: { location: ParkingLocation }) {
         </div>
 
         <DialogFooter>
-          <Button type="submit" className="w-full sm:w-auto">
-            Confirm Booking
+           <DialogClose asChild>
+            <Button id="close-dialog" variant="ghost">Cancel</Button>
+          </DialogClose>
+          <Button type="submit" className="w-full sm:w-auto" disabled={form.formState.isSubmitting}>
+             {form.formState.isSubmitting ? "Booking..." : "Confirm Booking"}
           </Button>
         </DialogFooter>
       </form>

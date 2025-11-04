@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ParkSmartIcon } from "@/components/icons";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { users } from "@/lib/data";
+import { useAuth, useFirestore, setDocumentNonBlocking } from "@/firebase";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
@@ -32,6 +34,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const { toast } = useToast();
   const authBgImage = PlaceHolderImages.find((img) => img.id === "auth-bg");
+  const auth = useAuth();
+  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,22 +46,37 @@ export default function RegisterPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, you'd save the new user to the database.
-    users.push({
-        id: users.length + 1,
-        name: values.name,
-        email: values.email,
-        password: values.password, // Don't store plain text passwords!
-        role: "user",
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
 
-    toast({
-      title: "Registration Successful",
-      description: "You can now log in with your credentials.",
-    });
+      // Update user profile
+      await updateProfile(user, { displayName: values.name });
 
-    router.push("/");
+      // Create user document in Firestore
+      const userDocRef = doc(firestore, "users", user.uid);
+      setDocumentNonBlocking(userDocRef, {
+        id: user.uid,
+        firstName: values.name.split(" ")[0] || "",
+        lastName: values.name.split(" ").slice(1).join(" ") || "",
+        email: user.email,
+        registrationDate: new Date().toISOString(),
+      }, { merge: true });
+
+      toast({
+        title: "Registration Successful",
+        description: "You can now log in with your credentials.",
+      });
+
+      router.push("/");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Registration Failed",
+        description: error.message || "Could not create account.",
+      });
+    }
   }
 
   return (
@@ -117,8 +136,8 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Create account
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "Creating account..." : "Create account"}
               </Button>
             </form>
           </Form>
