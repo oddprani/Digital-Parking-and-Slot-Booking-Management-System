@@ -1,6 +1,9 @@
+
 import { z } from "zod";
 
 export const bookingSchema = z.object({
+  userName: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  carNumber: z.string().min(4, { message: "Please enter a valid vehicle number." }),
   entryDate: z.date({
     required_error: "Entry date is required.",
   }),

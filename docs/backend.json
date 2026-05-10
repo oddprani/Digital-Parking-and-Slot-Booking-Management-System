@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -121,6 +122,14 @@
           "type": "string",
           "description": "Reference to User. (Relationship: User 1:N Booking)"
         },
+        "userName": {
+          "type": "string",
+          "description": "Name of the person making the booking."
+        },
+        "carNumber": {
+          "type": "string",
+          "description": "Vehicle registration number."
+        },
         "parkingSlotId": {
           "type": "string",
           "description": "Reference to ParkingSlot. (Relationship: ParkingSlot 1:N Booking)"
@@ -152,6 +161,8 @@
       "required": [
         "id",
         "userId",
+        "userName",
+        "carNumber",
         "parkingSlotId",
         "entryDateTime",
         "exitDateTime",
