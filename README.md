@@ -106,5 +106,4 @@ The application uses **Firestore Security Rules** to ensure:
 *   Authentication is required for all booking operations.
 
 ---
-
-*This project was developed as a digital parking management solution for Chamarajanagara, Karnataka.*
+*This project was developed by reethu GB and Vivek Kalgurti**
