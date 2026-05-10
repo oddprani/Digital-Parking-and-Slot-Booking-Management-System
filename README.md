@@ -1,83 +1,110 @@
-# 🚗 ParkSmart - Digital Parking Management System
+# 🚗 ParkSmart - Chamarajanagara Digital Parking System
 
-A **web-based smart parking management application** built with **Next.js**, **React**, **TypeScript**, **Tailwind CSS**, and **Firebase**. This system allows users to find and book parking slots online with real-time availability tracking and secure authentication.
-
----
-
-## 🧩 Features
-
-*   🔐 **Firebase Authentication** – Secure user registration and login.
-*   🕒 **Real-Time Slot Availability** – View available parking slots from a Firestore database.
-*   💳 **Online Booking** – Reserve parking spots with start and end times.
-*   📊 **Admin Dashboard** – Manage parking locations and view overall occupancy.
-*   📱 **Responsive UI** – Built with ShadCN UI components and Tailwind CSS for a modern, scalable design.
+ParkSmart is a modern, web-based parking management and slot booking application tailored for Chamarajanagara, Karnataka. It allows users to find, check availability, and book parking spots in real-time, while providing administrators with a comprehensive dashboard to manage locations and track occupancy.
 
 ---
 
-## 🏗️ Tech Stack
+## 🏗️ Technical Stack
 
-| Category         | Technology                                                              |
-| ---------------- | ----------------------------------------------------------------------- |
-| **Framework**    | [Next.js](https://nextjs.org/) (with App Router)                        |
-| **UI**           | [React](https://react.dev/), [ShadCN UI](https://ui.shadcn.com/), [Tailwind CSS](https://tailwindcss.com/) |
-| **Language**     | [TypeScript](https://www.typescriptlang.org/)                         |
-| **Backend**      | [Firebase](https://firebase.google.com/) (Authentication & Firestore) |
-| **GenAI**        | [Genkit](https://firebase.google.com/docs/genkit)                     |
-
----
-
-## ⚙️ Running the Project Locally
-
-To run this project on your local machine, follow these steps.
-
-### 1. Install Dependencies
-
-First, you need to install the necessary Node.js packages. Open your terminal in the project's root directory and run:
-
-```bash
-npm install
-```
-
-### 2. Run the Development Server
-
-Once the dependencies are installed, you can start the Next.js development server. The project is configured to run on port `9002`.
-
-```bash
-npm run dev
-```
-
-The application will now be running at [http://localhost:9002](http://localhost:9002).
-
-### Firebase Setup
-
-This project is configured to connect to a Firebase project automatically. When you run the application for the first time, it will seed the Firestore database with initial data for parking locations.
+| Category | Technology |
+| :--- | :--- |
+| **Frontend** | [Next.js 15](https://nextjs.org/) (App Router), [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/), [ShadCN UI](https://ui.shadcn.com/) |
+| **Backend** | [Firebase](https://firebase.google.com/) (Authentication & Cloud Firestore) |
+| **Icons** | [Lucide React](https://lucide.dev/) |
 
 ---
 
-## 🧰 Folder Structure
+## 🧩 Key Features
 
-The project uses the Next.js App Router structure.
+### 👤 User Features
+*   **Real-time Booking:** Browse parking locations in Chamarajanagara and book slots instantly.
+*   **Digital Tickets:** Generate a printable parking ticket with a unique slot ID and vehicle details.
+*   **Availability Calendar:** Check future availability for any location using an interactive calendar.
+*   **Booking History:** Track upcoming, active, and completed parking sessions.
+*   **Secure Auth:** Firebase-powered login and registration.
 
+### 🛡️ Admin Features
+*   **Global Overview:** Monitor total revenue, active bookings, and overall city-wide occupancy.
+*   **Location Management:** Add, edit, and track specific parking lots (e.g., KSRTC Bus Stand, JSS College).
+*   **Real-time Monitoring:** Live progress bars showing occupancy percentages for every location.
+*   **Automatic Seeding:** The system automatically populates Chamarajanagara-specific data if the database is empty.
+
+---
+
+## ⚙️ Getting Started
+
+### Prerequisites
+*   [Node.js](https://nodejs.org/) (v18 or higher)
+*   [npm](https://www.npmjs.com/)
+
+### Installation
+
+1.  **Clone the repository** (or download the source code).
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+3.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
+4.  **Access the app**:
+    Open [http://localhost:9002](http://localhost:9002) in your browser.
+
+---
+
+## 📖 How to Use
+
+### 1. Registration & Login
+*   Navigate to the landing page.
+*   If you don't have an account, click **Sign up** to create one.
+*   Log in with your email and password.
+
+### 2. Booking a Spot (User)
+*   On the **Dashboard**, you'll see cards for different locations in Chamarajanagara.
+*   Click **Book Now** on a location.
+*   Fill in your **Name**, **Vehicle Number** (e.g., KA 10 M 1234), and select your **Entry/Exit times**.
+*   Click **Confirm & Book**.
+*   A **Parking Ticket** will be generated. You can print this ticket for offline use.
+
+### 3. Checking Availability
+*   Click the **Calendar icon** in the sidebar.
+*   Select a location from the dropdown.
+*   The calendar will show the number of available slots for each day.
+
+### 4. Admin Dashboard
+*   Click the **Admin View** icon (Layout grid) in the bottom of the sidebar.
+*   **Overview**: View stats like total revenue and occupancy rates.
+*   **Locations**: Manage the list of parking lots. If the list is empty, the app will automatically seed data for Chamarajanagara's key landmarks.
+
+---
+
+## 📂 Project Structure
+
+```text
+src/
+├── app/                  # Next.js App Router (Routes & Pages)
+│   ├── admin/            # Admin Dashboard routes
+│   ├── dashboard/        # User Dashboard routes
+│   └── (auth)/           # Login & Register pages
+├── components/           # UI Components
+│   ├── ui/               # ShadCN atomic components
+│   ├── dashboard/        # Dashboard-specific components (Forms, Cards)
+│   └── admin/            # Admin-specific components (Stats, Views)
+├── firebase/             # Firebase config, hooks, and providers
+├── lib/                  # Utilities, Types, and Zod Schemas
+└── hooks/                # Custom React hooks (Toast, etc.)
 ```
-parksmart-app/
-│
-├── src/
-│   ├── app/                 # Main application routes and pages
-│   │   ├── admin/           # Admin dashboard pages
-│   │   ├── dashboard/       # User dashboard pages
-│   │   ├── layout.tsx
-│   │   └── page.tsx         # Login page
-│   │
-│   ├── components/          # Reusable React components
-│   │   ├── ui/              # ShadCN UI components
-│   │   └── ...
-│   │
-│   ├── firebase/            # Firebase configuration and hooks
-│   │
-│   ├── lib/                 # Utility functions, data types, etc.
-│   └── ...
-│
-├── public/                  # Static assets
-├── package.json             # Project dependencies and scripts
-└── next.config.ts           # Next.js configuration
-```
+
+---
+
+## 🛡️ Security
+The application uses **Firestore Security Rules** to ensure:
+*   Users can only read and write their own bookings.
+*   Parking locations are globally readable but protected for authorized modifications.
+*   Authentication is required for all booking operations.
+
+---
+
+*This project was developed as a digital parking management solution for Chamarajanagara, Karnataka.*
